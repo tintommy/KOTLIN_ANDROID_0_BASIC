@@ -24,8 +24,10 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        getRequestWithPathparameters()
-        getRequestWithQueryparameters()
+    /*  getRequestWithPathparameters()
+        getRequestWithQueryparameters()*/
+
+        uploadAlbum()
 
         /* val retService = RetrofitInstance.getRetrofitInstance().create(AlbumService::class.java)
 
@@ -58,7 +60,7 @@ class MainActivity : AppCompatActivity() {
 //            val response = retService.getAlbums()
             /* val userIdsList = listOf(1, 2, 3) // Ví dụ danh sách userId
              val response = retService.getSortedAlbums(userIdsList)*/
-            val response = retService.getSortedAlbums(3) //lấy album
+            val response = retService.getAlbums() //lấy album
             if (response.isSuccessful) {
                 val albumsList = response.body() // Lấy danh sách album từ phản hồi API
                 withContext(Dispatchers.Main) {
@@ -110,6 +112,23 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun uploadAlbum(){
+        val album= AlbumsItem(0,"My Title",3)
+
+        val postResponse: LiveData<Response<AlbumsItem>> = liveData {
+            val response= retService.uploadAlbum(album)
+            emit(response)
+        }
+
+        postResponse.observe(this, Observer{
+            val receivedAlbumsItem= it.body()
+            val result = " " + "Album Title: ${receivedAlbumsItem?.title} \n" +
+                    " id: ${receivedAlbumsItem?.id} \n" +
+                    " Userid: ${receivedAlbumsItem?.userId} \n\n\n"
+            binding.textView4.append(result)
+        })
     }
 
 }
